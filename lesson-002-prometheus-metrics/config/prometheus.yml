@@ -1,0 +1,19 @@
+# See
+# https://github.com/prometheus/prometheus/blob/master/docs/getting_started.md.
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+# A scrape configuration with two endpoint to scrape:
+# - Prometheus itself in localhost:9090
+# - Our server in localhost:8080
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "api-server"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["localhost:8080"]
