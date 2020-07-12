@@ -271,6 +271,33 @@ After doing a couple more `curl http://localhost:8080/` we had the following
 
 ![](./images/prom-graph.png)
 
+One more note on our Prometheus query.
+Right now, we have been visualizing the total number of http responses by using
+```
+http_responses_total
+```
+
+as the query.
+However, assuming we had a more complex server and we had some requests that
+ended up in more than 200 status code, we could further focus on them by using
+queries such as
+```
+http_responses_total{code="200"}
+```
+
+to see all responses that had a 200 status code.
+If we had multiple instances of our server, we could also visualize the
+responses per instance by using
+```
+http_responses_total{instance="localhost:8080"}
+```
+
+And if we wanted to see all the responses with a specific status code (i.e.,
+200) from a specific host
+```
+http_responses_total{code="200", instance="localhost:8080"}
+```
+
 ## References
 
 Some good reading material that will give you more context:
