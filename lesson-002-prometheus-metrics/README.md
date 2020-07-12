@@ -178,6 +178,20 @@ func NewServerCommand() *cobra.Command {
 }
 ```
 
+And to use our counter (that can have a value set for the http response status
+code) we can do something like
+```go
+responsesTotal.With(prometheus.Labels{"code": "200"}).Inc()
+```
+
+Which will increase by 1 the total number of http responses (with status code
+200).
+Similarly, in the case of a 500 status code
+```go
+responsesTotal.With(prometheus.Labels{"code": "500"}).Inc()
+```
+
+
 The code in this directory already has this all setup for you.
 If you go ahead and run it, you will see our metric showing up in
 http://0.0.0.0:8080/metrics.
