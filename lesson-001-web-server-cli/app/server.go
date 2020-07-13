@@ -13,7 +13,7 @@ import (
 var listenAddr string
 
 // NewServerCommand creates a cobra command. A command represents an action,
-// the action in our case is to run out web server.
+// the action in our case is to run our web server.
 func NewServerCommand() *cobra.Command {
 	// Before going forward, please take a look at this page:
 	// https://godoc.org/github.com/spf13/cobra#Command, here you will find a
