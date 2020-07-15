@@ -8,19 +8,17 @@ But before we dive into code, we will present some concepts we will be working o
 
 ## Knowledge bits
 
-- in Go, we organise our code into modules. In our case we will only define the `main` package. This specific package name is used by the Go compiler to know that the package should compile as an executable program.
+- In Go, we organize our code into modules. Go modules are in turn made up of packages.
 
-    Also, the `main` **function** in the **package** `main` will be the entry point of our executable.
+  In our case we will only define the `main` package. This specific package name is used by the Go compiler to know that the package should compile as an executable program.
 
-    More info on this topic can be found in this [link](https://blog.golang.org/using-go-modules).
+    The `main` **function** in the **package** `main` will be the entry point of our executable.
 
-- Functions in Go can return more than one value. This is a common pattern and we will be using it like in the following example:
+    More info on this topic can be found in this in https://blog.golang.org/using-go-modules.
 
-    `host, err := os.Hostname()`
+- Functions in Go can return more than one value. It is a common pattern in Go to always return an error on operations that may fail. One should then check if the error variable is `nil`, which means there was no error, or to handle the error if not `nil`.
 
-    Here we are expecting to assign the output of `os.Hostname()` into `host` variable.
-    If something goes wrong, we would receive the error into `err` variable.
-    It is also a common pattern in Go to check if the variable expecting the **error** is `nil`, and change your application workflow depending on its value, like in the following example:
+  For example:
 
     ```
     host, err := os.Hostname()
@@ -33,7 +31,7 @@ But before we dive into code, we will present some concepts we will be working o
 
 - pointers: no, don't worry about the naming (you can not do pointer arithmetic as in C or C++). Pointers in Go are used to pass variables by reference to functions. This means, we will be using the exact same object that was passed.
 
-- when using `Sprintf`, `Fprintf` or `Printf`,  we can use several modifiers to present the data. In this lesson we will use:
+- when using `Sprintf`, `Fprintf` or `Printf` (or any printing function that ends with an `f`)  we can use several **printing verbs** to present the data. (official docs in https://golang.org/pkg/fmt/) In this lesson we will use:
   - `%v`: we will output the value in a default format
   - `%s`: the output would be the `string` format
 
@@ -82,9 +80,7 @@ Greeting from alejandrox1-machine1!
 
 ### Next steps (optional)
 
-As shown, we currently have one (root) route, which means: it works but not very practical.
-
-We would like to extend the current lesson with:
+Couple interesting things we can do:
 - add more routes to the existing server
 - be able to read URL params (e.g http://localhost:8080/hello?user=alejandrox&lesson=0) and output
   ```
