@@ -1,10 +1,34 @@
 # Lesson 3: Web server graceful shutdown
 
-Taking as a foundation the webserver created in [lesson 0](../lesson-000-web-server/), we will be adding `graceful shutdown` functionality to it.
+Taking as a foundation the webserver created in [lesson 000](../lesson-000-web-server/), we will be adding `graceful shutdown` functionality to it.
 
 In order to achieve this, we will be using `channels` and `goroutines`
 
 ## Knowledge bits
+
+
+### Goroutines
+
+A `goroutine` is a lightweight thread of execution managed by the Go runtime; it is the way we have to run a piece of code concurrently with the original calling code, as we can see explained in the [oficial documentation.](https://tour.golang.org/concurrency/1)
+
+A small example could be:
+
+```
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(s)
+	}
+}
+
+func main() {
+	go say("k8s")
+	say("contribute")
+}
+```
+
+Calling `go printMyString()` is where we start a new `goroutine`, calling our already defined `printMyString` function, while the `main` function runs in its own `goroutine` (called the _main goroutine_)
+
 
 ### Channels
 
@@ -22,47 +46,42 @@ v := <-ch  // Receive from ch, and
            // assign value to v.
 ```
 
-In our case we want to use channels along with `goroutines`.
+**_Unbuffered_ vs _buffered_ channels**
 
-### Goroutines
+Channels are created **blocking by default** (or _unbuffered_)
 
-A `goroutine` is a lightweight thread of execution managed by the Go runtime; it is the way we have to run a piece of code concurrently with the original calling code, as we can see explained in the [oficial documentation.](https://tour.golang.org/concurrency/1)
+Unbuffered channels are those which both goroutines (one sending data to the buffer, another waiting to receive the resource) require to be ready to exchange some data. If a goroutine is trying to send a resource to an unbuffered channel and there is no goroutine waiting to receive that resource, the channel will lock the sender and make it wait.
+And viceversa.
 
-A small example could be:
-
-```
-func printMyString() {
-    fmt.Println("my string")
-}
-
-func main() {
-    go printMyString()
-    time.Sleep(100 * time.Millisecond)
-    fmt.Println("printMyString function")
-}
-```
-
-In line 6 is where we start a new `goroutine`, calling our already defined `printMyString` function, while the `main` function runs in its own `goroutine` (called the _main goroutine_)
-
-
-**_But how are we going to use both features together?_**
-
-
-We need to point something about channels: they are **blocking by default**.
+On the other hand, buffered channels have capacity and they are able to keep a number of resources.
+The only times buffered channels will lock goroutines are: when a sender tries to send a resource and the channel is full or when a goroutine tries to get a resource and the channel is empty.
 
 We can use this in our benefit and block our server from being closed until all pending requests have been served when we receive a specific signal.
+
+
+### Signals
+
+Signals are software interrupts sent to a program to indicate that an event has happened.
+
+In this example we will take care of two specific signals: `os.Interrupt` and `syscall.SIGTERM`:
+
+- `os.Interrupt` this is tipically the signal sent when we type Control-C, which normally causes the program to exit.
+- `syscall.SIGTERM` is usually sent when you want to give the process an opportunity to clean up before termination.
+
 
 ## Lesson content
 
 After getting a quick intro to `channels` and `goroutines`, we will dive into our lesson.
 
-As we initially stated, the current implementation is based on our server from lesson0.
+As we initially stated, the current implementation is based on our server from [lesson 000](../lesson-000-web-server/).
 
-To achieve _graceful shutdown_ we added the following main changes:
+
+To achieve _graceful shutdown_ we added the following changes:
 
 - created a `sigint` channel; we will use it to notify our goroutine we have received a signal: `os.Interrupt` or `syscall.SIGTERM` in this case
 - with `server.SetKeepAlivesEnabled(false)` we set the server to not keep alive any connection (which in fact is the desired effect of having a gracefull shutdown behavior)
 - create the `done` channel; this one will be used to let the main goroutine we have finished the graceful shutdown.
+
 
 ## Testing It
 

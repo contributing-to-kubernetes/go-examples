@@ -34,6 +34,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	// Build a string with the hostname.
 	greeting := fmt.Sprintf("Greeting from %s!\n", host)
 	fmt.Fprintf(w, greeting)
+	time.Sleep(5 * time.Second)
 }
 
 func main() {
