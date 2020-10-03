@@ -50,11 +50,12 @@ v := <-ch  // Receive from ch, and
 
 Channels are created **blocking by default** (or _unbuffered_)
 
-Unbuffered channels are those which both goroutines (one sending data to the buffer, another waiting to receive the resource) require to be ready to exchange some data. If a goroutine is trying to send a resource to an unbuffered channel and there is no goroutine waiting to receive that resource, the channel will lock the sender and make it wait.
+If we try to send a resource to an unbuffered channel, the channel will lock (preventing us from sending anything else into the channel) until someone else reads from it.
+This essentially means that an unbuffered channel is restricted to never having more than 1 element inside of it.
 And viceversa.
 
 On the other hand, buffered channels have capacity and they are able to keep a number of resources.
-The only times buffered channels will lock goroutines are: when a sender tries to send a resource and the channel is full or when a goroutine tries to get a resource and the channel is empty.
+The only times buffered channels will lock goroutines are when a sender tries to send a resource and the channel is full or when a goroutine tries to get a resource and the channel is empty.
 
 We can use this in our benefit and block our server from being closed until all pending requests have been served when we receive a specific signal.
 
@@ -78,7 +79,7 @@ As we initially stated, the current implementation is based on our server from [
 
 To achieve _graceful shutdown_ we added the following changes:
 
-- created a `sigint` channel; we will use it to notify our goroutine we have received a signal: `os.Interrupt` or `syscall.SIGTERM` in this case
+- created a `sigint` channel; we will use it to notify our goroutine we have received a signal: `os.Interrupt` or `syscall.SIGTERM`
 - with `server.SetKeepAlivesEnabled(false)` we set the server to not keep alive any connection (which in fact is the desired effect of having a gracefull shutdown behavior)
 - create the `done` channel; this one will be used to let the main goroutine we have finished the graceful shutdown.
 
