@@ -27,7 +27,7 @@ func main() {
 }
 ```
 
-Calling `go printMyString()` is where we start a new `goroutine`, calling our already defined `printMyString` function, while the `main` function runs in its own `goroutine` (called the _main goroutine_)
+Calling `go say()` is where we start a new `goroutine`, calling our already defined `say` function, while the `main` function runs in its own `goroutine` (called the _main goroutine_)
 
 
 ### Channels
@@ -79,9 +79,11 @@ As we initially stated, the current implementation is based on our server from [
 
 To achieve _graceful shutdown_ we added the following changes:
 
-- created a `sigint` channel; we will use it to notify our goroutine we have received a signal: `os.Interrupt` or `syscall.SIGTERM`
-- with `server.SetKeepAlivesEnabled(false)` we set the server to not keep alive any connection (which in fact is the desired effect of having a gracefull shutdown behavior)
+- created a `sigint` channel; we will use it to notify our goroutine we have received a signal: `os.Interrupt` or `syscall.SIGTERM` in this case
+- with `server.SetKeepAlivesEnabled(false)` we set the server to not keep alive any connection (which in fact is the desired effect of having a gracefull shutdown behavior) to allow our server to finish processing any requests already received before the app received a termination signal.
+The first step is to disable "keep alive" TCP connections [https://godoc.org/net/http#Server.SetKeepAlivesEnabled](https://godoc.org/net/http#Server.SetKeepAlivesEnabled) before proceeding with the graceful shutdown of the server [https://godoc.org/net/http#Server.Shutdown](https://godoc.org/net/http#Server.Shutdown)
 - create the `done` channel; this one will be used to let the main goroutine we have finished the graceful shutdown.
+Adding this in the `func main()` allows us to run code only after the app is shut down - if needed
 
 
 ## Testing It
